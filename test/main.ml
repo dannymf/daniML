@@ -39,6 +39,7 @@ let tests = [
   make_b "leq" true "1<=1";
   make_i "if2" 22 "if 1+2 <= 3+4 then 22 else 0";
   make_i "if3" 22 "if 1+2 <= 3*4 then let x = 22 in x else 0";
+  make_b "letifpre" true "let x = 1+2 <= 3*4 in x";
   make_i "letif" 22 "let x = 1+2 <= 3*4 in if x then 22 else 0";
   make_t "ty plus" bop_err "1 + true";
   make_t "ty mult" bop_err "1 * false";

@@ -30,6 +30,7 @@ let rec make_apply e = function
 %token LEQ
 %token TIMES  
 %token PLUS
+%token MINUS
 %token LPAREN
 %token RPAREN
 %token LET
@@ -40,8 +41,8 @@ let rec make_apply e = function
 %token ELSE
 %token FUN
 %token FIX
+// %token LETFIX
 %token ARROW
-%token END
 %token EOF
 
 // %nonassoc IN
@@ -51,7 +52,6 @@ let rec make_apply e = function
 %nonassoc LEQ
 %left PLUS
 %left TIMES
-%left APP
 
 %start <Ast.expr> prog
 
@@ -63,21 +63,20 @@ prog:
 expr:
 	| e1 = expr PLUS e2 = expr { Binop (Add, e1, e2) }
 	| e1 = expr TIMES e2 = expr { Binop (Mult, e1, e2) }
+	| e1 = expr MINUS e2 = expr { Binop (Minus, e1, e2) }
+	| e1 = expr LEQ e2 = expr { Binop (Leq, e1, e2) }
 	| e = atom { e }
-	| e = atom @ es = atom+ { make_apply e es }
-	| FUN x = ID ARROW e = expr { Fun (x, e) } 
-	| FIX name = ID x = ID ARROW e = expr { Rec (name, x, e) }
+	| e = atom es = atom+ { make_apply e es }
 
 atom:
 	| i = INT { Int i }
 	| x = ID { Var x }
 	| TRUE { Bool true }
 	| FALSE { Bool false }
-	| e1 = atom LEQ e2 = atom { Binop (Leq, e1, e2) }
 	| LET x = ID EQUALS e1 = expr IN e2 = expr { Let (x, e1, e2) }
 	| IF e1 = expr THEN e2 = expr ELSE e3 = expr { If (e1, e2, e3) }
 	| FUN x = ID ARROW e = expr { Fun (x, e) }
-	| LET FIX name = ID x = ID ARROW e = expr { Rec (name, x, e) }
+	| LET FIX name = ID x = ID EQUALS e1 = expr IN e2 = expr { Let (name, Rec (name, x, e1), e2) }
 	| LPAREN e=expr RPAREN { e } 
 	;
 	

@@ -18,6 +18,7 @@ rule read =
   | "<=" { LEQ }
   | "*" { TIMES }
   | "+" { PLUS }
+  | "-" { MINUS }
   | "(" { LPAREN }
   | ")" { RPAREN }
   | "let" { LET }
@@ -29,7 +30,7 @@ rule read =
   | "->" { ARROW }
   | "fun" { FUN }
   | "fix" { FIX }
-  | "end" { END }
+  (* | "let fix" {LETFIX} *)
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | eof { EOF }

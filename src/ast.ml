@@ -1,6 +1,7 @@
 (** The type of binary operators. *)
 type bop = 
   | Add
+  | Minus
   | Mult
   | Leq
 
@@ -19,11 +20,9 @@ type expr =
   | Var of var
   | Int of int
   | Bool of bool
-  (* | Rec of var * var * expr *)
   | Fun of var * expr
   | Rec of var * var * expr
-  (* | AnonClosure of var * expr * env *)
-  | NamedClosure of var * var * expr * env
+  | Closure of var * var * expr * env
   | App of expr * expr
   | Binop of bop * expr * expr
   | Let of var * expr * expr

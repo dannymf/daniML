@@ -19,8 +19,7 @@ let interp_big = Interp.Main.interp_big
         match result with
         | Int x -> string_of_int x
         | Bool x -> string_of_bool x
-        | AnonClosure (x, _, _) -> "anon_closure fun " ^ x ^ " -> expr" 
-        | NamedClosure (x, _, _, _) -> "named_closure fun " ^ x ^ " -> expr"
+        | Closure (x, _, _, _) -> "named_closure fun " ^ x ^ " -> expr"
         | Var _ | Let _ | Binop _ | If _ 
         | Fun _ | App _ | Rec _ -> "precondition violated"
         end
