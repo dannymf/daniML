@@ -5,10 +5,16 @@ type bop =
   | Mult
   | Leq
 
-type tname = string
-type typ = TString | TInt | TArrow of typ * typ | TData of tname
+(* type tname = string *)
+type typ = 
+  | TInt
+  | TBool 
+  (* | TClosure *)
+  | TArrow of typ * typ
+(* type typ = TString | TInt | TArrow of typ * typ | TData of tname *)
+(* type constructor = string * typ list *)
 type var = string
-type constructor = string * typ list
+
 
 (** [Env] is module to help with environments, which 
     are maps that have strings as keys. *)
@@ -20,9 +26,9 @@ type expr =
   | Var of var
   | Int of int
   | Bool of bool
-  | Fun of var * expr
-  | Rec of var * var * expr
-  | Closure of var * var * expr * env
+  | Fun of var * typ * expr
+  | Rec of var * var * typ * expr
+  | Closure of var * var * typ * expr * env
   | App of expr * expr
   | Binop of bop * expr * expr
   | Let of var * expr * expr
@@ -32,13 +38,13 @@ type expr =
 
 and env = expr Env.t
 
-and branch = constructor * expr
+(* and branch = constructor * expr *)
 
-type decl =
+(* type decl =
   | DLet of var * expr
-  | DData of tname * constructor list
+  | DData of tname * constructor list *)
 
-type prog = decl list
+(* type prog = decl list *)
 (* type prog = decl list * expr *)
 (* execute expression, bind values to environment associated w corresponding var
    if dataD, record fact that user created new var *)

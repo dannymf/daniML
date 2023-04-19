@@ -41,8 +41,13 @@ let rec make_apply e = function
 %token ELSE
 %token FUN
 %token FIX
-// %token LETFIX
 %token ARROW
+
+// TYPES
+%token COLON
+%token INT_TYPE
+%token BOOL_TYPE
+
 %token EOF
 
 // %nonassoc IN
@@ -75,8 +80,12 @@ atom:
 	| FALSE { Bool false }
 	| LET x = ID EQUALS e1 = expr IN e2 = expr { Let (x, e1, e2) }
 	| IF e1 = expr THEN e2 = expr ELSE e3 = expr { If (e1, e2, e3) }
-	| FUN x = ID ARROW e = expr { Fun (x, e) }
-	| LET FIX name = ID x = ID EQUALS e1 = expr IN e2 = expr { Let (name, Rec (name, x, e1), e2) }
+	| FUN x = ID COLON t = typ ARROW e = expr { Fun (x, t, e) }
+	| LET FIX name = ID x = ID COLON t = typ EQUALS e1 = expr IN e2 = expr { Let (name, Rec (name, x, t, e1), e2) }
 	| LPAREN e=expr RPAREN { e } 
+
+typ:
+	| INT_TYPE { TInt }
+	| BOOL_TYPE { TBool }
 	;
 	

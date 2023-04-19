@@ -29,7 +29,11 @@ rule read =
   | "else" { ELSE }
   | "->" { ARROW }
   | "fun" { FUN }
+  (* | "lamb" { FUN } *)
   | "fix" { FIX }
+  | ":" { COLON }
+  | "int" { INT_TYPE }
+  | "bool" { BOOL_TYPE }
   (* | "let fix" {LETFIX} *)
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
