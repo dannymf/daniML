@@ -1,5 +1,14 @@
-(* open Ast
+open Ast
 
+let rec string_of_typ typ =
+  match typ with
+  | TInt -> "int"
+  | TBool -> "bool"
+  | TArrow (t1, t2) -> "(" ^ string_of_typ t1 ^ " -> " ^ string_of_typ t2 ^ ")"
+
+let string_of_typexp s =
+  s |> Main.parse |> Typing.typeof Context.ContextMap.empty |> string_of_typ
+(*
 type constant = 
   Int of int | Bool of bool
 

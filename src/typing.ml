@@ -7,7 +7,7 @@ open Context
 let rec typeof ctx = function
   | Int _ -> TInt
   | Bool _ -> TBool
-  | Closure (_, x, typ, e, _) -> typeof_fun ctx x typ e
+  | Closure (name, x, typ, e, _) -> typeof_rec ctx name x typ e
   | Var x -> ContextMap.lookup ctx x
   | Let (x, e1, e2) -> typeof_let ctx x e1 e2
   | Binop (bop, e1, e2) -> typeof_bop ctx bop e1 e2
@@ -43,8 +43,8 @@ and typeof_if ctx e1 e2 e3 =
 
 and typeof_app ctx e1 e2 =
   match typeof ctx e1, typeof ctx e2 with
-  | TArrow (typ1, typ2), typ3 when typ1 = typ2 ->
-    typ3
+  | TArrow (typ1, typ2), typ3 when typ1 = typ3 ->
+    typ2
   | _ -> type_error Errors.app_err
 
 

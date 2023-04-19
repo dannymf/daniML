@@ -1,6 +1,8 @@
 exception TypeError of string
 exception RuntimeError of string
 
+let typ_error_test s =
+  TypeError s
 let type_error s =
   raise (TypeError s)
 
