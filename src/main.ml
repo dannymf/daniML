@@ -19,13 +19,14 @@ type typ =
 
 (** [eval_big e] is the [e ==> v] relation. *)
 let rec eval_big (env : env) (e : expr) : expr = match e with
-  | Int _ | Bool _ -> e
+  | Int _ | Bool _ | Float _ | Unit -> e
   | Closure _ -> e
   | Binop (bop, e1, e2) -> eval_bop env bop e1 e2
   | Let (x, e1, e2) -> eval_let env x e1 e2
+  | LetRec _ -> failwith "TODO"
   | If (e1, e2, e3) -> eval_if env e1 e2 e3
   | Fun (x, typ, e1) -> eval_fun env x typ e1
-  | Rec (name, x, typ,  e1) -> eval_rec env name x typ e1 
+  | Rec (name, x, e1, typ) -> eval_rec env name x e1 typ
   | App (e1, e2) -> eval_app env e1 e2
   | Var x -> eval_var env x
 
@@ -47,10 +48,10 @@ and eval_if env e1 e2 e3 = match eval_big env e1 with
   | _ -> runtime_error Errors.if_guard_err
 
 and eval_fun env x typ e = 
-  Closure ("_", x, typ, e, env)
+  Closure ("_", x, e, typ, env)
 
-and eval_rec env name x typ e = 
-  Closure (name, x, typ, e, env)
+and eval_rec env name x e typ = 
+  Closure (name, x, e, typ, env)
 
 and eval_app env e1 e2 =
   match eval_big env e1 with
@@ -59,7 +60,7 @@ and eval_app env e1 e2 =
       let env_for_body = Env.add x v2 defenv in
       eval_big env_for_body e
     end *)
-  | Closure (name, x, _, e, defenv) as rec_closure -> 
+  | Closure (name, x, e, _, defenv) as rec_closure -> 
     (* print_endline "got here"; *)
     begin
       let v2 = eval_big env e2 in

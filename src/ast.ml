@@ -9,7 +9,8 @@ type bop =
 type typ = 
   | TInt
   | TBool 
-  (* | TClosure *)
+  | TUnit
+  | TFloat
   | TArrow of typ * typ
 (* type typ = TString | TInt | TArrow of typ * typ | TData of tname *)
 (* type constructor = string * typ list *)
@@ -23,15 +24,18 @@ module Env = Map.Make(String)
 
 (** The type of the abstract syntax tree (AST). *)
 type expr =
+  | Unit
   | Var of var
   | Int of int
   | Bool of bool
+  | Float of float
   | Fun of var * typ * expr
-  | Rec of var * var * typ * expr
-  | Closure of var * var * typ * expr * env
+  | Rec of var * var * expr * typ
+  | Closure of var * var * expr * typ * env
   | App of expr * expr
   | Binop of bop * expr * expr
   | Let of var * expr * expr
+  | LetRec of var * typ * expr * expr
   | If of expr * expr * expr
   (* | Cons of constructor
   | Match of expr * branch list *)

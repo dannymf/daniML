@@ -29,3 +29,5 @@ let if_guard_err = "Guard of if must have type bool"
 let app_err = "The first expression must have type fun or fix"
 
 let annotation_error = "Let expression type mismatch"
+
+let rec_arrow_err = "Type of recursive func must be arrow"

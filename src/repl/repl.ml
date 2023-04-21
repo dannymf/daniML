@@ -17,11 +17,12 @@ let interp_big = Interp.Main.interp_big
         (* let interp_typ = Interp.Main.typeof Interp.Main.Context.empty result in *)
         let result_str = begin
         match result with
+        | Unit -> "unit"
         | Int x -> string_of_int x
         | Bool x -> string_of_bool x
-        | Closure (x, _, _, _, _) -> "named_closure fun " ^ x ^ " -> expr"
-        | Var _ | Let _ | Binop _ | If _ 
-        | Fun _ | App _ | Rec _ -> "precondition violated"
+        | Float x -> string_of_float x
+        | Closure (_, _, _, typ, _) -> "closure " ^ Printing.string_of_typ typ
+        | _ -> "precondition violated"
         end
         (* let type_str = begin
           match interp_typ with

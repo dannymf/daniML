@@ -2,9 +2,12 @@
 open Parser
 }
 
-let white = [' ' '\t']+
+let white = [' ' '\t' '\n']+
 let digit = ['0'-'9']
-let int = '-'? digit+
+let frac = '.' digit*
+let exp = ['e' 'E'] ['-' '+']? digit+
+let int = digit+
+let float = digit* frac exp?
 let letter = ['a'-'z' 'A'-'Z']
 let letter_num = ['a'-'z' 'A'-'Z' '0'-'9' '_']
 let id = letter+ letter_num*
@@ -30,11 +33,15 @@ rule read =
   | "->" { ARROW }
   | "fun" { FUN }
   (* | "lamb" { FUN } *)
-  | "fix" { FIX }
+  | "let fix" { LETFIX }
   | ":" { COLON }
   | "int" { INT_TYPE }
   | "bool" { BOOL_TYPE }
+  | "float" { FLOAT_TYPE }
+  | "unit" { UNIT_TYPE }
+  | "()" { UNIT_TYPE }
   (* | "let fix" {LETFIX} *)
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
+  | float { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | eof { EOF }

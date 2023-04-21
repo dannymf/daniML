@@ -52,6 +52,9 @@ let tests = [
   make_i "if3" 22 "if 1+2 <= 3*4 then let x = 22 in x else 0";
   make_b "letifpre" true "let x = 1+2 <= 3*4 in x";
   make_i "letif" 22 "let x = 1+2 <= 3*4 in if x then 22 else 0";
+  make_i "rec1" 6 "let fix fact x : int -> int = if x <= 1 then 1 else x * fact (x - 1) in fact 3";
+  make_i "fibrec" 55 "let fix fib x : int -> int = if x <= 0 then 0 else if x <= 1 then 1 else fib (x-1) + fib (x-2) in fib 10";
+  make_i "doubarg" 40 "(fun x:int -> fun y:int -> x*y) 5 8";
 ]
 
 let type_tests = [
@@ -63,10 +66,14 @@ let type_tests = [
   make_typerr "unbound" unbound_var_err "x";
   make_s "typint1" "int" "3";
   make_s "typint2" "int" "482 + 903";
-  make_s "typint3" "int" "-9021 * 32142";
+  make_s "typint3" "int" "(0-9021) * 32142";
   make_s "typbool1" "bool" "true";
   make_s "typbool2" "bool" "if false then true else false";
   make_s "typfun1" "(int -> int)" "fun x:int -> x * 5";
+  make_s "typrec1" "int" "let fix fact x : int -> int = if x <= 1 then 1 else x * fact (x - 1) in fact 3";
+  make_s "typrec2" "(int -> int)" "let fix fact x : int -> int = if x <= 1 then 1 else x * fact (x-1) in fact";
+  make_s "typfib" "(int -> int)" "let fix fib x : int -> int = if x <= 0 then 0 else if x <= 1 then 1 else fib (x-1) + fib (x-2) in fib";
+  make_s "typdoubarg" "(int -> (int -> int))" "fun x:int -> fun y:int -> x*y";
 ]
 
 let _ = run_test_tt_main ("suite" >::: List.flatten (tests @ type_tests))

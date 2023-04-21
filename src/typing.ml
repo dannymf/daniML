@@ -7,13 +7,16 @@ open Context
 let rec typeof ctx = function
   | Int _ -> TInt
   | Bool _ -> TBool
-  | Closure (name, x, typ, e, _) -> typeof_rec ctx name x typ e
+  | Float _ -> TFloat
+  | Unit -> TUnit
+  | Closure (_, _, _, typ, _) -> typ
   | Var x -> ContextMap.lookup ctx x
   | Let (x, e1, e2) -> typeof_let ctx x e1 e2
   | Binop (bop, e1, e2) -> typeof_bop ctx bop e1 e2
   | If (e1, e2, e3) -> typeof_if ctx e1 e2 e3
   | Fun (x, typ, e) -> typeof_fun ctx x typ e
-  | Rec (name, x, typ, e) -> typeof_rec ctx name x typ e
+  | Rec (name, x, e, typ) -> typeof_rec ctx name x e typ
+  | LetRec (name, typ, e1, e2) -> typeof_letrec ctx name typ e1 e2
   | App (e1, e2) -> typeof_app ctx e1 e2
 
 (** Helper function for [typeof]. *)
@@ -53,12 +56,21 @@ and typeof_fun ctx x typ e =
   let t1 = typeof ctx' e in
   TArrow (typ, t1)
 
-and typeof_rec ctx name x typ e =
-  let ctx' = ContextMap.extend ctx x typ in
-  let ctx'' = ContextMap.extend ctx' name (TArrow (typ, typeof ctx' e)) in
-  let t1 = typeof ctx'' e in
-  TArrow (typ, t1)
+and typeof_rec ctx name x e typ =
+  match typ with
+  | TArrow (typ1, typ2) -> begin
+    let ctx' = ContextMap.extend ctx x typ1 in
+    let ctx'' = ContextMap.extend ctx' name (TArrow (typ1, typ2)) in
+    ignore (typeof ctx'' e);
+    TArrow (typ1, typ2)
+    end
+  | _ -> type_error Errors.rec_arrow_err
 
+and typeof_letrec =
+    (* ctx name typ e1 e2 *)
+    failwith "TODO"
+    
+  
 (** [typecheck e] checks whether [e] is well typed in
     the empty context. Raises: [Failure] if not. *)
 let typecheck e =
