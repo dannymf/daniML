@@ -1,5 +1,5 @@
 open Interp
-let interp_big = Interp.Main.interp_big
+let interp_big = Interp.Eval.interp_big
 (* let string_of_const = Interp.Printing.string_of_const *)
 
   let rec read_eval_print input_acc =

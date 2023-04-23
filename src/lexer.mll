@@ -17,7 +17,6 @@ rule read =
   | white { read lexbuf }
   | "true" { TRUE }
   | "false" { FALSE }
-  (* | "random" { RANDOM } *)
   | "<=" { LEQ }
   | "*" { TIMES }
   | "+" { PLUS }
@@ -34,13 +33,21 @@ rule read =
   | "fun" { FUN }
   (* | "lamb" { FUN } *)
   | "let fix" { LETFIX }
+  (* | "let fix" {LETFIX} *)
+
+  (* TYPES *)
   | ":" { COLON }
   | "int" { INT_TYPE }
   | "bool" { BOOL_TYPE }
   | "float" { FLOAT_TYPE }
   | "unit" { UNIT_TYPE }
   | "()" { UNIT_TYPE }
-  (* | "let fix" {LETFIX} *)
+
+  (* PROBABILISTIC *)
+  | "S" { RANDOM }
+  | "sample" { SAMPLE }
+  | "from" { FROM }
+
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | float { INT (int_of_string (Lexing.lexeme lexbuf)) }

@@ -9,9 +9,14 @@ let rec typeof ctx = function
   | Bool _ -> TBool
   | Float _ -> TFloat
   | Unit -> TUnit
+  | Prob _ -> TProb
   | Closure (_, _, _, typ, _) -> typ
   | Var x -> ContextMap.lookup ctx x
   | Let (x, e1, e2) -> typeof_let ctx x e1 e2
+
+  | Sample (x, e1, e2) -> typeof_sample ctx x e1 e2
+  | AppProb (e1, e2) -> typeof_appprob ctx e1 e2
+
   | Binop (bop, e1, e2) -> typeof_bop ctx bop e1 e2
   | If (e1, e2, e3) -> typeof_if ctx e1 e2 e3
   | Fun (x, typ, e) -> typeof_fun ctx x typ e
@@ -34,6 +39,10 @@ and typeof_let ctx x e1 e2 =
   let t' = typeof ctx e1 in
   let ctx' = ContextMap.extend ctx x t' in
   typeof ctx' e2
+
+and typeof_sample = 
+  (* typeof_sample ctx e1 e2 *)
+  failwith "TODO"
 
 (** Helper function for [typeof]. *)
 and typeof_if ctx e1 e2 e3 =
@@ -69,8 +78,10 @@ and typeof_rec ctx name x e typ =
 and typeof_letrec =
     (* ctx name typ e1 e2 *)
     failwith "TODO"
+and typeof_appprob =
+    (* typeof_appprob ctx e1 e2 *)
+    failwith "TODO"
     
-  
 (** [typecheck e] checks whether [e] is well typed in
     the empty context. Raises: [Failure] if not. *)
 let typecheck e =

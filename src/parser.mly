@@ -20,10 +20,10 @@ let rec make_apply e = function
 %token <int> INT
 %token <string> ID
 
-// NEW
-// %token RANDOM
-// %token SAMPLE
-// %token FROM
+// PROBABILISTIC
+%token RANDOM
+%token SAMPLE
+%token FROM
 
 %token TRUE
 %token FALSE
@@ -42,7 +42,6 @@ let rec make_apply e = function
 %token FUN
 %token LETFIX
 %token ARROW
-%token APP
 
 // TYPES
 %token COLON
@@ -60,7 +59,7 @@ let rec make_apply e = function
 %nonassoc LEQ
 %left PLUS MINUS
 %left TIMES
-%nonassoc APP
+// %nonassoc APP
 
 %start <Ast.expr> prog
 
@@ -83,6 +82,7 @@ atom:
 	| TRUE { Bool true }
 	| FALSE { Bool false }
 	| LET x = ID EQUALS e1 = expr IN e2 = expr { Let (x, e1, e2) }
+	| SAMPLE x = ID FROM e1 = expr IN e2 = expr { Sample (x, e1, e2) }
 	| IF e1 = expr THEN e2 = expr ELSE e3 = expr { If (e1, e2, e3) }
 	| FUN x = ID COLON t = typ ARROW e = expr { Fun (x, t, e) }
 	| LETFIX name = ID x = ID COLON t1 = typ ARROW t2 = typ EQUALS e1 = expr IN e2 = expr { Let (name, Rec (name, x, e1, TArrow(t1,t2)), e2) }
@@ -93,6 +93,7 @@ atom:
 typ:
 	| INT_TYPE { TInt }
 	| BOOL_TYPE { TBool }
+	| FLOAT_TYPE { TFloat }
 	;
 	
 	// let fix fact x : int -> int = if x <= 1 then 1 else x * fact (x - 1) in fact

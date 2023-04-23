@@ -5,12 +5,13 @@ type bop =
   | Mult
   | Leq
 
-(* type tname = string *)
+(** [typ] represents the type of an expression. *)
 type typ = 
   | TInt
   | TBool 
   | TUnit
   | TFloat
+  | TProb
   | TArrow of typ * typ
 (* type typ = TString | TInt | TArrow of typ * typ | TData of tname *)
 (* type constructor = string * typ list *)
@@ -20,7 +21,6 @@ type var = string
 (** [Env] is module to help with environments, which 
     are maps that have strings as keys. *)
 module Env = Map.Make(String)
-
 
 (** The type of the abstract syntax tree (AST). *)
 type expr =
@@ -35,6 +35,10 @@ type expr =
   | App of expr * expr
   | Binop of bop * expr * expr
   | Let of var * expr * expr
+  (* Probabilistic *)
+  | Sample of var * expr * expr
+  | Prob of expr
+  | AppProb of expr * expr
   | LetRec of var * typ * expr * expr
   | If of expr * expr * expr
   (* | Cons of constructor
