@@ -1,7 +1,8 @@
 open Ast
 open Errors
-open Typing
+(* open Typing *)
 (* open Prob *)
+open Random
 
 module Env = Ast.Env
 type env = Ast.env
@@ -23,18 +24,19 @@ let parse (s : string) : expr =
 (** [eval_big e] is the [e ==> v] relation. *)
 let rec eval_big (env : env) (e : expr) : expr = match e with
   | Int _ | Bool _ | Float _ | Unit | Prob _ -> e
+  | Random -> Float (RandomGen.random ())
   | Closure _ -> e
   | Binop (bop, e1, e2) -> eval_bop env bop e1 e2
   | Let (x, e1, e2) -> eval_let env x e1 e2
   | Sample (x, e1, e2) -> eval_sample env x e1 e2
-  | LetRec _ -> failwith "TODO"
+  (* | LetRec _ -> failwith "TODO" *)
   | If (e1, e2, e3) -> eval_if env e1 e2 e3
   | Fun (x, typ, e1) -> eval_fun env x typ e1
   | Rec (name, x, e1, typ) -> eval_rec env name x e1 typ
   | App (e1, e2) -> eval_app env e1 e2
-  | AppProb (e1, e2) -> eval_appprob env e1 e2
+  | AppProb e -> eval_appprob env e
   | Var x -> eval_var env x
-
+  | Decl _ -> e
 
 and eval_var env x = 
   try Env.find x env with Not_found -> runtime_error Errors.unbound_var_err
@@ -77,17 +79,31 @@ and eval_let env x e1 e2 =
   match eval_big env e1 with
   | e -> eval_big (Env.add x e env) e2
 
- and eval_sample =
-  failwith "TODO"
+ and eval_sample env x e1 e2 =
  (* eval_sample env x e1 e2 *)
-  (* match eval_big env e1 with
-  |  -> eval_big (Env.add x e env) (App (e2, app e1)) *)
+  let app_e = eval_appprob env e1 in
+    let env' = Env.add x app_e env in
+    eval_big env' e2
  
-  and eval_appprob =
-  (* eval_appprob env e1 e2 *)
-  failwith "TODO"
+  and eval_appprob env e =
+    match eval_big env e with
+    | Prob e' -> eval_big env e'
+    | _ -> runtime_error Errors.app_err
+
+
+let eval_big_env (env : env) (e : expr) : expr * env =
+  match e with
+  | Decl (x, e) -> begin
+    let e1' = eval_big env e in
+    e1', Env.add x e1' env
+  end
+  | _ -> eval_big env e, env
 
 (** [interp_big s] interprets [s] by parsing, type-checking,
     and evaluating it with the big-step model. *)
 let interp_big (s : string) : expr =
-  s |> parse |> typecheck |> (eval_big Env.empty)
+  s |> parse |> (eval_big Env.empty)
+  (* s |> parse |> typecheck |> (eval_big Env.empty) *)
+
+let interp_big_env (s : string) (env: env) : expr * env =
+  s |> parse |> eval_big_env env

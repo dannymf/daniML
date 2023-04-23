@@ -25,6 +25,7 @@ module Env = Map.Make(String)
 (** The type of the abstract syntax tree (AST). *)
 type expr =
   | Unit
+  | Random
   | Var of var
   | Int of int
   | Bool of bool
@@ -35,11 +36,12 @@ type expr =
   | App of expr * expr
   | Binop of bop * expr * expr
   | Let of var * expr * expr
+  | Decl of var * expr
   (* Probabilistic *)
   | Sample of var * expr * expr
   | Prob of expr
-  | AppProb of expr * expr
-  | LetRec of var * typ * expr * expr
+  | AppProb of expr
+  (* | LetRec of var * typ * expr * expr *)
   | If of expr * expr * expr
   (* | Cons of constructor
   | Match of expr * branch list *)

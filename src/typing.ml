@@ -10,18 +10,20 @@ let rec typeof ctx = function
   | Float _ -> TFloat
   | Unit -> TUnit
   | Prob _ -> TProb
+  | Random -> TFloat
+  | Decl (_, e) -> typeof ctx e
   | Closure (_, _, _, typ, _) -> typ
   | Var x -> ContextMap.lookup ctx x
   | Let (x, e1, e2) -> typeof_let ctx x e1 e2
 
   | Sample (x, e1, e2) -> typeof_sample ctx x e1 e2
-  | AppProb (e1, e2) -> typeof_appprob ctx e1 e2
+  | AppProb e -> typeof_appprob ctx e
 
   | Binop (bop, e1, e2) -> typeof_bop ctx bop e1 e2
   | If (e1, e2, e3) -> typeof_if ctx e1 e2 e3
   | Fun (x, typ, e) -> typeof_fun ctx x typ e
   | Rec (name, x, e, typ) -> typeof_rec ctx name x e typ
-  | LetRec (name, typ, e1, e2) -> typeof_letrec ctx name typ e1 e2
+  (* | LetRec (name, typ, e1, e2) -> typeof_letrec ctx name typ e1 e2 *)
   | App (e1, e2) -> typeof_app ctx e1 e2
 
 (** Helper function for [typeof]. *)
@@ -40,9 +42,10 @@ and typeof_let ctx x e1 e2 =
   let ctx' = ContextMap.extend ctx x t' in
   typeof ctx' e2
 
-and typeof_sample = 
+and typeof_sample _ _ _ _ = 
   (* typeof_sample ctx e1 e2 *)
-  failwith "TODO"
+  TInt
+  (* failwith "TODO" *)
 
 (** Helper function for [typeof]. *)
 and typeof_if ctx e1 e2 e3 =
@@ -75,12 +78,13 @@ and typeof_rec ctx name x e typ =
     end
   | _ -> type_error Errors.rec_arrow_err
 
-and typeof_letrec =
+(* and typeof_letrec =
     (* ctx name typ e1 e2 *)
-    failwith "TODO"
-and typeof_appprob =
+    failwith "TODO" *)
+and typeof_appprob _ _ =
     (* typeof_appprob ctx e1 e2 *)
-    failwith "TODO"
+    TInt
+    (* failwith "TODO" *)
     
 (** [typecheck e] checks whether [e] is well typed in
     the empty context. Raises: [Failure] if not. *)

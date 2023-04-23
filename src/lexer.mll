@@ -47,8 +47,9 @@ rule read =
   | "S" { RANDOM }
   | "sample" { SAMPLE }
   | "from" { FROM }
+  | "prob" { PROB }
 
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
-  | float { INT (int_of_string (Lexing.lexeme lexbuf)) }
+  | float { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
   | eof { EOF }

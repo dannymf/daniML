@@ -18,12 +18,14 @@ let rec make_apply e = function
 %}
 
 %token <int> INT
+%token <float> FLOAT
 %token <string> ID
 
 // PROBABILISTIC
 %token RANDOM
 %token SAMPLE
 %token FROM
+%token PROB
 
 %token TRUE
 %token FALSE
@@ -78,16 +80,20 @@ expr:
 
 atom:
 	| i = INT { Int i }
+	| f = FLOAT { Float f }
 	| x = ID { Var x }
 	| TRUE { Bool true }
 	| FALSE { Bool false }
 	| LET x = ID EQUALS e1 = expr IN e2 = expr { Let (x, e1, e2) }
+	| LET x = ID EQUALS e = expr { Decl (x, e) }
 	| SAMPLE x = ID FROM e1 = expr IN e2 = expr { Sample (x, e1, e2) }
 	| IF e1 = expr THEN e2 = expr ELSE e3 = expr { If (e1, e2, e3) }
 	| FUN x = ID COLON t = typ ARROW e = expr { Fun (x, t, e) }
 	| LETFIX name = ID x = ID COLON t1 = typ ARROW t2 = typ EQUALS e1 = expr IN e2 = expr { Let (name, Rec (name, x, e1, TArrow(t1,t2)), e2) }
-	| LETFIX name = ID COLON t = typ EQUALS e1 = expr IN e2 = expr { LetRec (name, t, e1, e2) }
-	| LPAREN e=expr RPAREN { e } 
+	// | LETFIX name = ID COLON t = typ EQUALS e1 = expr IN e2 = expr { LetRec (name, t, e1, e2) }
+	| RANDOM { Random } 
+	| PROB e = expr { Prob e }
+	| LPAREN e = expr RPAREN { e } 
 
 	// FIX THIS
 typ:
