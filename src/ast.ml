@@ -11,7 +11,8 @@ type typ =
   | TBool 
   | TUnit
   | TFloat
-  | TProb
+  (* | TProb *)
+  | TProb of typ
   | TArrow of typ * typ
 (* type typ = TString | TInt | TArrow of typ * typ | TData of tname *)
 (* type constructor = string * typ list *)

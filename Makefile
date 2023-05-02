@@ -12,5 +12,9 @@ repl:
 test:
 	dune exec test/main.exe
 
+.PHONY: run
+run:
+	dune exec test/run.exe
+
 clean:
 	dune clean

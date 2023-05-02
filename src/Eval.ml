@@ -27,9 +27,10 @@ let rec eval_big (env : env) (e : expr) : expr = match e with
   | Random -> Float (RandomGen.random ())
   | Closure _ -> e
   | Binop (bop, e1, e2) -> eval_bop env bop e1 e2
+  (* | Op (op, es) ->  
+     (type of es is list) *) 
   | Let (x, e1, e2) -> eval_let env x e1 e2
   | Sample (x, e1, e2) -> eval_sample env x e1 e2
-  (* | LetRec _ -> failwith "TODO" *)
   | If (e1, e2, e3) -> eval_if env e1 e2 e3
   | Fun (x, typ, e1) -> eval_fun env x typ e1
   | Rec (name, x, e1, typ) -> eval_rec env name x e1 typ

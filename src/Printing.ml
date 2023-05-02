@@ -1,4 +1,5 @@
 open Ast
+open Errors
 
 let rec string_of_typ typ =
   match typ with
@@ -6,20 +7,18 @@ let rec string_of_typ typ =
   | TBool -> "bool"
   | TUnit -> "unit"
   | TFloat -> "float"
-  | TProb -> "prob"
+  | TProb t -> "prob " ^ string_of_typ t
   | TArrow (t1, t2) -> "(" ^ string_of_typ t1 ^ " -> " ^ string_of_typ t2 ^ ")"
 
 let string_of_typexp s =
   s |> Eval.parse |> Typing.typeof Context.ContextMap.empty |> string_of_typ
-(*
-type constant = 
-  Int of int | Bool of bool
 
-let string_of_const c = 
-  match c with 
+let string_of_val = function
     | Int i -> string_of_int i
     | Bool b -> string_of_bool b
-
+    | Float f -> string_of_float f
+    | _ -> runtime_error "Not a val"
+(*
 let string_of_op op = 
   match op with 
     | Add -> "+" 

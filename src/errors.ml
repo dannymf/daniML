@@ -31,3 +31,7 @@ let app_err = "The first expression must have type fun or fix"
 let annotation_error = "Let expression type mismatch"
 
 let rec_arrow_err = "Type of recursive func must be arrow"
+
+let proba_err = "Can only draw sample of prob type"
+
+let bind_sample_err = "First expression must be prob type"

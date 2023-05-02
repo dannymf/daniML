@@ -9,7 +9,7 @@ let rec typeof ctx = function
   | Bool _ -> TBool
   | Float _ -> TFloat
   | Unit -> TUnit
-  | Prob _ -> TProb
+  | Prob e -> TProb (typeof ctx e)
   | Random -> TFloat
   | Decl (_, e) -> typeof ctx e
   | Closure (_, _, _, typ, _) -> typ
@@ -42,10 +42,12 @@ and typeof_let ctx x e1 e2 =
   let ctx' = ContextMap.extend ctx x t' in
   typeof ctx' e2
 
-and typeof_sample _ _ _ _ = 
-  (* typeof_sample ctx e1 e2 *)
-  TInt
-  (* failwith "TODO" *)
+and typeof_sample ctx x e1 e2 = 
+  match typeof ctx e1 with
+  | TProb t ->
+    let ctx' = ContextMap.extend ctx x t in
+    typeof ctx' e2
+  | _ -> type_error Errors.bind_sample_err
 
 (** Helper function for [typeof]. *)
 and typeof_if ctx e1 e2 e3 =
@@ -81,10 +83,10 @@ and typeof_rec ctx name x e typ =
 (* and typeof_letrec =
     (* ctx name typ e1 e2 *)
     failwith "TODO" *)
-and typeof_appprob _ _ =
-    (* typeof_appprob ctx e1 e2 *)
-    TInt
-    (* failwith "TODO" *)
+and typeof_appprob ctx e =
+    match typeof ctx e with
+    | TProb e' -> e'
+    | _ -> type_error Errors.proba_err
     
 (** [typecheck e] checks whether [e] is well typed in
     the empty context. Raises: [Failure] if not. *)
