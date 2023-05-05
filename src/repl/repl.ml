@@ -18,7 +18,6 @@ let interp_big_env = Interp.Eval.interp_big_env
         (* let interp_typ = Interp.Main.typeof Interp.Main.Context.empty result in *)
         let result_str = begin
         match result with
-        | Unit -> "unit"
         | Int x -> string_of_int x
         | Bool x -> string_of_bool x
         | Float x -> string_of_float x

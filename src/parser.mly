@@ -26,6 +26,7 @@ let rec make_apply e = function
 %token SAMPLE
 %token FROM
 %token PROB
+%token UNPROB
 
 %token TRUE
 %token FALSE
@@ -49,19 +50,13 @@ let rec make_apply e = function
 %token COLON
 %token INT_TYPE
 %token BOOL_TYPE
-%token UNIT_TYPE
 %token FLOAT_TYPE
 
 %token EOF
 
-// %nonassoc IN
-// %nonassoc ELSE
-// %nonassoc ARROW
-// %nonassoc ARROW
 %nonassoc LEQ
 %left PLUS MINUS
 %left TIMES
-// %nonassoc APP
 
 %start <Ast.expr> prog
 
@@ -89,17 +84,14 @@ atom:
 	| SAMPLE x = ID FROM e1 = expr IN e2 = expr { Sample (x, e1, e2) }
 	| IF e1 = expr THEN e2 = expr ELSE e3 = expr { If (e1, e2, e3) }
 	| FUN x = ID COLON t = typ ARROW e = expr { Fun (x, t, e) }
-	| LETFIX name = ID x = ID COLON t1 = typ ARROW t2 = typ EQUALS e1 = expr IN e2 = expr { Let (name, Rec (name, x, e1, TArrow(t1,t2)), e2) }
-	// | LETFIX name = ID COLON t = typ EQUALS e1 = expr IN e2 = expr { LetRec (name, t, e1, e2) }
+	| LETFIX name = ID EQUALS FUN x = ID COLON t = typ ARROW e1 = expr IN e2 = expr { Let (name, Rec (name, x, e1, t), e2) }
 	| RANDOM { Random } 
 	| PROB e = expr { Prob e }
+	| UNPROB e = expr { Sample ("_", e, Var "_") }
 	| LPAREN e = expr RPAREN { e } 
 
-	// FIX THIS
 typ:
 	| INT_TYPE { TInt }
 	| BOOL_TYPE { TBool }
 	| FLOAT_TYPE { TFloat }
 	;
-	
-	// let fix fact x : int -> int = if x <= 1 then 1 else x * fact (x - 1) in fact

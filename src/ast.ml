@@ -25,7 +25,6 @@ module Env = Map.Make(String)
 
 (** The type of the abstract syntax tree (AST). *)
 type expr =
-  | Unit
   | Random
   | Var of var
   | Int of int

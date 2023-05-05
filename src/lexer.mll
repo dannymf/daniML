@@ -40,14 +40,13 @@ rule read =
   | "int" { INT_TYPE }
   | "bool" { BOOL_TYPE }
   | "float" { FLOAT_TYPE }
-  | "unit" { UNIT_TYPE }
-  | "()" { UNIT_TYPE }
 
   (* PROBABILISTIC *)
   | "S" { RANDOM }
   | "sample" { SAMPLE }
   | "from" { FROM }
   | "prob" { PROB }
+  | "unprob" { UNPROB }
 
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }

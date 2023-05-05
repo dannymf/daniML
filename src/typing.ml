@@ -8,7 +8,6 @@ let rec typeof ctx = function
   | Int _ -> TInt
   | Bool _ -> TBool
   | Float _ -> TFloat
-  | Unit -> TUnit
   | Prob e -> TProb (typeof ctx e)
   | Random -> TFloat
   | Decl (_, e) -> typeof ctx e

@@ -21,9 +21,32 @@ let parse (s : string) : expr =
   | TProb
   | TClosure *)
 
+  (** [subst e v x] is [e] with [v] substituted for [x], that
+    is, [e{v/x}]. *)
+  let rec subst e v x = match e with
+  | Var y -> if x = y then v else e
+  | Int _ | Float _ | Bool _ | Decl _
+  | Fun _ | Rec _ | App _ | AppProb _
+  | Random | Closure _ -> e
+  | Prob e -> Prob (subst e v x)
+  | Binop (bop, e1, e2) -> Binop (bop, subst e1 v x, subst e2 v x)
+  | Let (y, e1, e2) ->
+    let e1' = subst e1 v x in
+    if x = y
+    then Let (y, e1', e2)
+    else Let (y, e1', subst e2 v x)
+  | Sample (y, e1, e2) -> 
+    let e1' = subst e1 v x in
+    if x = y
+    then Sample (y, e1', e2)
+    else Sample (y, e1', subst e2 v x)
+  | If (e1, e2, e3) -> 
+    If (subst e1 v x, subst e2 v x, subst e3 v x)  
+
+  
 (** [eval_big e] is the [e ==> v] relation. *)
 let rec eval_big (env : env) (e : expr) : expr = match e with
-  | Int _ | Bool _ | Float _ | Unit | Prob _ -> e
+  | Int _ | Bool _ | Float _ | Prob _ -> e
   | Random -> Float (RandomGen.random ())
   | Closure _ -> e
   | Binop (bop, e1, e2) -> eval_bop env bop e1 e2
@@ -66,13 +89,18 @@ and eval_rec env name x e typ =
   Closure (name, x, e, typ, env)
 
 and eval_app env e1 e2 =
+  let v2 = eval_big env e2 in
   match eval_big env e1 with
   | Closure (name, x, e, _, defenv) as rec_closure -> 
     begin
-      let v2 = eval_big env e2 in
-      let env' = Env.add x v2 defenv in
-      let env'' = Env.add name rec_closure env' in
-      eval_big env'' e
+      match e with
+      | Prob exp -> 
+        Prob (subst exp v2 x) 
+      | _ -> begin
+        let env' = Env.add x v2 defenv in
+        let env'' = Env.add name rec_closure env' in
+        eval_big env'' e
+        end
     end
   | _ -> runtime_error Errors.app_err
 
@@ -107,4 +135,4 @@ let interp_big (s : string) : expr =
   (* s |> parse |> typecheck |> (eval_big Env.empty) *)
 
 let interp_big_env (s : string) (env: env) : expr * env =
-  s |> parse |> eval_big_env env
+  s |> parse |> eval_big_env env 

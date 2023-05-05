@@ -52,8 +52,8 @@ let tests = [
   make_i "if3" 22 "if 1+2 <= 3*4 then let x = 22 in x else 0";
   make_b "letifpre" true "let x = 1+2 <= 3*4 in x";
   make_i "letif" 22 "let x = 1+2 <= 3*4 in if x then 22 else 0";
-  make_i "rec1" 6 "let fix fact x : int -> int = if x <= 1 then 1 else x * fact (x - 1) in fact 3";
-  make_i "fibrec" 55 "let fix fib x : int -> int = if x <= 0 then 0 else if x <= 1 then 1 else fib (x-1) + fib (x-2) in fib 10";
+  make_i "rec1" 6 "let fix fact = fun x : int -> if x <= 1 then 1 else x * fact (x - 1) in fact 3";
+  make_i "fibrec" 55 "let fix fib = fun x : int -> if x <= 0 then 0 else if x <= 1 then 1 else fib (x-1) + fib (x-2) in fib 10";
   make_i "doubarg" 40 "(fun x:int -> fun y:int -> x*y) 5 8";
 ]
 
