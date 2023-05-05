@@ -1,6 +1,6 @@
 open Ast
 open Errors
-(* open Typing *)
+open Typing
 (* open Prob *)
 open Random
 
@@ -26,9 +26,10 @@ let parse (s : string) : expr =
   let rec subst e v x = match e with
   | Var y -> if x = y then v else e
   | Int _ | Float _ | Bool _ | Decl _
-  | Fun _ | Rec _ | App _ | AppProb _
+  | Fun _ | Rec _ | AppProb _
   | Random | Closure _ -> e
   | Prob e -> Prob (subst e v x)
+  | App (e1, e2) -> App (subst e1 v x, subst e2 v x)
   | Binop (bop, e1, e2) -> Binop (bop, subst e1 v x, subst e2 v x)
   | Let (y, e1, e2) ->
     let e1' = subst e1 v x in
@@ -56,7 +57,7 @@ let rec eval_big (env : env) (e : expr) : expr = match e with
   | Sample (x, e1, e2) -> eval_sample env x e1 e2
   | If (e1, e2, e3) -> eval_if env e1 e2 e3
   | Fun (x, typ, e1) -> eval_fun env x typ e1
-  | Rec (name, x, e1, typ) -> eval_rec env name x e1 typ
+  | Rec (name, t1, x, t2, e1) -> eval_rec env name t1 x t2 e1
   | App (e1, e2) -> eval_app env e1 e2
   | AppProb e -> eval_appprob env e
   | Var x -> eval_var env x
@@ -83,10 +84,13 @@ and eval_if env e1 e2 e3 = match eval_big env e1 with
   | _ -> runtime_error Errors.if_guard_err
 
 and eval_fun env x typ e = 
-  Closure ("_", x, e, typ, env)
+  Closure (None, x, e, typ, env)
 
-and eval_rec env name x e typ = 
-  Closure (name, x, e, typ, env)
+and eval_rec env name t1 x e t2 =
+  Closure (Some (name, t1), x, t2, e, env)
+
+(* and eval_rec env name x e typ = 
+  Closure (name, x, e, typ, env) *)
 
 and eval_app env e1 e2 =
   let v2 = eval_big env e2 in
@@ -98,10 +102,13 @@ and eval_app env e1 e2 =
         Prob (subst exp v2 x) 
       | _ -> begin
         let env' = Env.add x v2 defenv in
+        (match name with
+        | None -> eval_big env' e
+        | Some (name, _) -> 
         let env'' = Env.add name rec_closure env' in
-        eval_big env'' e
-        end
+        eval_big env'' e)
     end
+  end
   | _ -> runtime_error Errors.app_err
 
 and eval_let env x e1 e2 =
@@ -131,8 +138,9 @@ let eval_big_env (env : env) (e : expr) : expr * env =
 (** [interp_big s] interprets [s] by parsing, type-checking,
     and evaluating it with the big-step model. *)
 let interp_big (s : string) : expr =
-  s |> parse |> (eval_big Env.empty)
-  (* s |> parse |> typecheck |> (eval_big Env.empty) *)
+  (* s |> parse |> (eval_big Env.empty) *)
+  s |> parse |> typecheck |> (eval_big Env.empty)
 
 let interp_big_env (s : string) (env: env) : expr * env =
-  s |> parse |> eval_big_env env 
+  (* s |> parse |> eval_big_env env  *)
+  s |> parse |> typecheck |> eval_big_env env

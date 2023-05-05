@@ -2,6 +2,15 @@ open Ast
 open Errors
 open Context
 
+let rec string_of_typ typ =
+  match typ with
+  | TInt -> "int"
+  | TBool -> "bool"
+  | TUnit -> "unit"
+  | TFloat -> "float"
+  | TProb t -> "prob " ^ string_of_typ t
+  | TArrow (t1, t2) -> "(" ^ string_of_typ t1 ^ " -> " ^ string_of_typ t2 ^ ")"
+
 (** [typeof ctx e] is the type of [e] in context [ctx]. 
     Raises: [Failure] if [e] is not well typed in [ctx]. *)
 let rec typeof ctx = function
@@ -14,15 +23,12 @@ let rec typeof ctx = function
   | Closure (_, _, _, typ, _) -> typ
   | Var x -> ContextMap.lookup ctx x
   | Let (x, e1, e2) -> typeof_let ctx x e1 e2
-
   | Sample (x, e1, e2) -> typeof_sample ctx x e1 e2
   | AppProb e -> typeof_appprob ctx e
-
   | Binop (bop, e1, e2) -> typeof_bop ctx bop e1 e2
   | If (e1, e2, e3) -> typeof_if ctx e1 e2 e3
   | Fun (x, typ, e) -> typeof_fun ctx x typ e
-  | Rec (name, x, e, typ) -> typeof_rec ctx name x e typ
-  (* | LetRec (name, typ, e1, e2) -> typeof_letrec ctx name typ e1 e2 *)
+  | Rec (name, t1, x, e, t2) -> typeof_rec ctx name t1 x e t2
   | App (e1, e2) -> typeof_app ctx e1 e2
 
 (** Helper function for [typeof]. *)
@@ -33,6 +39,7 @@ and typeof_bop ctx bop e1 e2 =
   | Mult, TInt, TInt 
   | Minus, TInt, TInt -> TInt
   | Leq, TInt, TInt -> TBool
+  | Leq, TFloat, TFloat -> TBool 
   | _ -> type_error Errors.bop_err
 
 (** Helper function for [typeof]. *)
@@ -46,7 +53,9 @@ and typeof_sample ctx x e1 e2 =
   | TProb t ->
     let ctx' = ContextMap.extend ctx x t in
     typeof ctx' e2
-  | _ -> type_error Errors.bind_sample_err
+  | _ -> 
+    print_endline (string_of_typ (typeof ctx e1));
+    type_error Errors.bind_sample_err
 
 (** Helper function for [typeof]. *)
 and typeof_if ctx e1 e2 e3 =
@@ -61,6 +70,7 @@ and typeof_app ctx e1 e2 =
   match typeof ctx e1, typeof ctx e2 with
   | TArrow (typ1, typ2), typ3 when typ1 = typ3 ->
     typ2
+  | TArrow _, _ -> type_error Errors.app_err_scd
   | _ -> type_error Errors.app_err
 
 
@@ -69,19 +79,13 @@ and typeof_fun ctx x typ e =
   let t1 = typeof ctx' e in
   TArrow (typ, t1)
 
-and typeof_rec ctx name x e typ =
-  match typ with
-  | TArrow (typ1, typ2) -> begin
-    let ctx' = ContextMap.extend ctx x typ1 in
-    let ctx'' = ContextMap.extend ctx' name (TArrow (typ1, typ2)) in
-    ignore (typeof ctx'' e);
-    TArrow (typ1, typ2)
-    end
-  | _ -> type_error Errors.rec_arrow_err
+(* TECHNICALLY WRONG *)
+(* and typeof_rec ctx name x e typ = *)
+and typeof_rec ctx name t1 x t2 e =
+  let ctx' = ContextMap.extend ctx name t1 in
+  let ctx'' = ContextMap.extend ctx' x t2 in
+  ignore (typeof ctx'' e); t1
 
-(* and typeof_letrec =
-    (* ctx name typ e1 e2 *)
-    failwith "TODO" *)
 and typeof_appprob ctx e =
     match typeof ctx e with
     | TProb e' -> e'
@@ -91,3 +95,6 @@ and typeof_appprob ctx e =
     the empty context. Raises: [Failure] if not. *)
 let typecheck e =
   ignore (typeof ContextMap.empty e); e
+
+let typecheck_env env e =
+  ignore (typeof env e); e

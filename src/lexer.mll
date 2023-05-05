@@ -29,7 +29,8 @@ rule read =
   | "if" { IF }
   | "then" { THEN }
   | "else" { ELSE }
-  | "->" { ARROW }
+  | "=>" { ARROW }
+  | "->" { TARROW }
   | "fun" { FUN }
   (* | "lamb" { FUN } *)
   | "let fix" { LETFIX }

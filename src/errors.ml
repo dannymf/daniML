@@ -32,6 +32,10 @@ let annotation_error = "Let expression type mismatch"
 
 let rec_arrow_err = "Type of recursive func must be arrow"
 
+let rec_err = "REC ERROR"
+
+let app_err_scd = "Second argument must have correct type"
+
 let proba_err = "Can only draw sample of prob type"
 
 let bind_sample_err = "First expression must be prob type"

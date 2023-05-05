@@ -8,7 +8,6 @@
   | [e'] -> App (e, e')
 	| h :: ((_ :: _) as t) -> make_apply (App (e, h)) t *)
 
-
 %{
 open Ast
 let rec make_apply e = function
@@ -45,6 +44,7 @@ let rec make_apply e = function
 %token FUN
 %token LETFIX
 %token ARROW
+%token TARROW
 
 // TYPES
 %token COLON
@@ -84,7 +84,7 @@ atom:
 	| SAMPLE x = ID FROM e1 = expr IN e2 = expr { Sample (x, e1, e2) }
 	| IF e1 = expr THEN e2 = expr ELSE e3 = expr { If (e1, e2, e3) }
 	| FUN x = ID COLON t = typ ARROW e = expr { Fun (x, t, e) }
-	| LETFIX name = ID EQUALS FUN x = ID COLON t = typ ARROW e1 = expr IN e2 = expr { Let (name, Rec (name, x, e1, t), e2) }
+	| LETFIX name = ID COLON t1 = typ EQUALS FUN x = ID COLON t2 = typ ARROW e1 = expr IN e2 = expr { Let (name, Rec (name, t1, x, t2, e1), e2) }
 	| RANDOM { Random } 
 	| PROB e = expr { Prob e }
 	| UNPROB e = expr { Sample ("_", e, Var "_") }
@@ -94,4 +94,6 @@ typ:
 	| INT_TYPE { TInt }
 	| BOOL_TYPE { TBool }
 	| FLOAT_TYPE { TFloat }
+	| PROB t = typ { TProb t }
+	| t1 = typ TARROW t2 = typ { TArrow (t1, t2) }
 	;

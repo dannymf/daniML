@@ -1,5 +1,6 @@
 open Interp
 module Env = Ast.Env
+module Context = Context.ContextMap
 let interp_big_env = Interp.Eval.interp_big_env
 (* let string_of_const = Interp.Printing.string_of_const *)
 

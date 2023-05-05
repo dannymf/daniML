@@ -11,7 +11,6 @@ type typ =
   | TBool 
   | TUnit
   | TFloat
-  (* | TProb *)
   | TProb of typ
   | TArrow of typ * typ
 (* type typ = TString | TInt | TArrow of typ * typ | TData of tname *)
@@ -31,17 +30,18 @@ type expr =
   | Bool of bool
   | Float of float
   | Fun of var * typ * expr
-  | Rec of var * var * expr * typ
-  | Closure of var * var * expr * typ * env
+  | Rec of var * typ * var * typ * expr
+  (* | Rec of var * expr * typ *)
+  | Closure of (var * typ) option * var * expr * typ * env
   | App of expr * expr
   | Binop of bop * expr * expr
   | Let of var * expr * expr
   | Decl of var * expr
+  
   (* Probabilistic *)
   | Sample of var * expr * expr
   | Prob of expr
   | AppProb of expr
-  (* | LetRec of var * typ * expr * expr *)
   | If of expr * expr * expr
   (* | Cons of constructor
   | Match of expr * branch list *)
