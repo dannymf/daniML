@@ -37,7 +37,7 @@
             if y <= 1 then 1
             else y * double_factorial 1 (y-1)
           else x * double_factorial (x-1) y
-        in double_factorial 5 10
+        in double_factorial 7 7
   ==================>
   25401600
   ```
