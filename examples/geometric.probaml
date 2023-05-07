@@ -1,0 +1,6 @@
+let bernoulli = fun pr:float => 
+    prob sample x from prob S in x <= pr in
+    let fix geometric : float -> prob int = fun p:float => 
+      prob sample b from bernoulli p in
+      if b then 0 else sample x from geometric p in 1 + x in
+      unprob geometric .00001

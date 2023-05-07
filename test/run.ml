@@ -45,6 +45,25 @@ let testtest =
   let fix factorial : int -> int =
     fun n:int => if n <= 1 then 1 else n * factorial (n - 1)
   in factorial x + y in testtest 5 7"
+
+let mutli_arg = 
+  "let multiarg2 = fun x:int => fun y:int =>
+  let fix double_factorial : int -> int -> int =
+    fun n:int =>
+      if x <= 1 then
+        if y <= 1 then 1
+        else y * double_factorial 1 (y-1)
+      else x * double_factorial (x-1) y
+    in double_factorial x y in multiarg2 5 3"
+
+    let mutli_arg3 = 
+      "let fix double_factorial : int -> int -> int =
+        fun x:int => fun y:int =>
+          if x <= 1 then
+            if y <= 1 then 1
+            else y * double_factorial 1 (y-1)
+          else x * double_factorial (x-1) y
+        in double_factorial 7 7"
 let eval_exp strname = fun () -> 
   Stdlib.Random.self_init ();
   interp_big strname
@@ -65,4 +84,4 @@ let run_n_times (n: int) (f: unit -> expr) =
 
 let _ = 
   let n = 10 in
-  run_n_times n (eval_exp testtest)
+  run_n_times n (eval_exp mutli_arg3)

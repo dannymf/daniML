@@ -54,6 +54,7 @@ let rec make_apply e = function
 
 %token EOF
 
+%right TARROW
 %nonassoc LEQ
 %left PLUS MINUS
 %left TIMES

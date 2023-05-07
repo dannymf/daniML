@@ -16,5 +16,9 @@ test:
 run:
 	dune exec test/run.exe
 
+.PHONY: interpret
+interpret:
+	dune exec test/interpret.exe $(n) $(fname)
+
 clean:
 	dune clean
